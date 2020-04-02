@@ -1,4 +1,5 @@
-// CRI ROFS decryptor v0.01 by roxfan (c) 2010
+// CRI ROFS decryptor
+// (C)2010 roxfan
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -279,7 +280,7 @@ int cvm_info(const char *cvm_file, const char *password, bool verbose)
 
 void usage()
 {
-  printf("ROFS tool v0.02 by roxfan (c) 2010.\n");
+  printf("ROFS tool (git version).\n");
   printf("Usage: cvm_tool [options] <command> <file1>...\n");
   printf("    available commands:\n");
   printf("    info  [-p <password>] <file.cvm>                          Show information about a ROFS volume\n");
