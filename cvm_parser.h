@@ -40,10 +40,7 @@ CVMH header
 100: numEntries*4  table of sector numbers
 */
 
-typedef unsigned char uint8_t;
-typedef char int8_t;
-typedef unsigned int uint32_t;
-typedef unsigned __int64 uint64_t;
+#include <stdint.h>
 
 #pragma pack(push, 1)
 struct iso_datetime

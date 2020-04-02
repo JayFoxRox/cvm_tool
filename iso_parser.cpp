@@ -3,6 +3,9 @@
 #include "iso_parser.h"
 #include <malloc.h>
 #include <memory.h>
+#ifndef _alloca
+#define _alloca(x) __builtin_alloca(x)
+#endif
 
 int  isonum_711(char * p);
 int  isonum_731(char * p);

@@ -1,5 +1,11 @@
 #include "cvm_parser.h"
 #include <stdlib.h>
+#include <inttypes.h>
+
+#ifndef _MSC_VER
+#define _byteswap_ulong(x) __builtin_bswap32(x)
+#define _byteswap_uint64(x) __builtin_bswap64(x)
+#endif
 
 inline uint32_t getBE32(void* buf) { return _byteswap_ulong(*(uint32_t*)(buf)); };
 inline uint64_t getBE64(void* buf) { return _byteswap_uint64(*(uint64_t*)(buf)); };
@@ -77,7 +83,7 @@ const char *fourcc2str(uint32_t fourcc)
 void print_cvmh(const CvmhInfo &cvmh)
 {
   printf("CVMH chunk:\n");
-  printf("  file size: 0x%08I64X\n", cvmh.fileSize);
+  printf("  file size: 0x%08" PRIX64 "\n", cvmh.fileSize);
   printf("  date: %04d-%02d-%02d %02d:%02d:%02d, GMT offset: %d minutes\n",
     cvmh.date.year + 1900, cvmh.date.month, cvmh.date.day,
     cvmh.date.hour, cvmh.date.minute, cvmh.date.second, cvmh.date.gmt_offset*15);
@@ -111,8 +117,8 @@ void print_zone(const ZoneInfo &zone)
   printf("  zone14: %d\n", zone.b_Zone14);
   printf("  sector len 1: %d\n", zone.sectorLen1);
   printf("  sector len 2: %d\n", zone.sectorLen2);
-  printf("  dataloc1: sector %d, len 0x%08I64X\n", zone.dataloc1.sector, zone.dataloc1.length);
-  printf("  dataloc ISO: sector %d, len 0x%08I64X\n", zone.datalocISO.sector, zone.datalocISO.length);
+  printf("  dataloc1: sector %d, len 0x%08" PRIX64 "\n", zone.dataloc1.sector, zone.dataloc1.length);
+  printf("  dataloc ISO: sector %d, len 0x%08" PRIX64 "\n", zone.datalocISO.sector, zone.datalocISO.length);
 }
 
 bool CvmParser::parse_cvmh(bool verbose)
@@ -165,12 +171,12 @@ bool CvmParser::parse_cvm(bool verbose)
   while ( off < fsize )
   {
     if ( verbose )
-      printf("%08I64X: ", off);
+      printf("%08" PRIX64 ": ", off);
     _fseeki64(inf, off, SEEK_SET);
     if ( !parseChunkHeader(inf, &hdr) )
       return false;
     if ( verbose )
-      printf("chunk '%s', length 0x%08I64X (0x%08I64X)\n", fourcc2str(hdr.id), hdr.len, hdr.len+12);
+      printf("chunk '%s', length 0x%08" PRIX64 " (0x%08" PRIX64 ")\n", fourcc2str(hdr.id), hdr.len, hdr.len+12);
     switch ( hdr.id )
     {
       case 'CVMH':
@@ -193,11 +199,11 @@ bool CvmParser::parse_cvm(bool verbose)
 bool CvmParser::set_iso_params(uint64_t iso_length, bool encrypted, bool verbose)
 {
   if ( verbose )
-    printf("Patching ISO zone length to 0x%08I64X\n", iso_length);
+    printf("Patching ISO zone length to 0x%08" PRIX64 "\n", iso_length);
   zone.datalocISO.length = iso_length;
   uint64_t file_length = iso_length + cvmh.isoStartSector * 0x800;
   if ( verbose )
-    printf("Patching file size to 0x%08I64X\n", file_length);
+    printf("Patching file size to 0x%08" PRIX64 "\n", file_length);
   cvmh.fileSize = file_length;
   if ( verbose )
     printf("Setting encryption flag to %d\n", encrypted);
